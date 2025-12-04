@@ -1,0 +1,16 @@
+{
+  "$schema": "https://rcade.dev/manifest.schema.json",
+  "name": "pac-man-halloween",
+  "display_name": "Pac-Man Halloween Google Doodle",
+  "description": "pac-man-halloween",
+  "visibility": "public",
+  "authors": {
+    "display_name": " "
+  },
+  "dependencies": [
+    {
+      "name": "@rcade/input-classic",
+      "version": "1.0.0"
+    }
+  ]
+}
