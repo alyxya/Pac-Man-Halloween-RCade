@@ -77,6 +77,14 @@ let currentFps = 0
 let gameFps = '--'
 let gameFrameTime = '--'
 let phaserGame = null
+let errorCount = 0
+
+// Count errors
+const originalConsoleError = console.error
+console.error = (...args) => {
+  errorCount++
+  originalConsoleError.apply(console, args)
+}
 
 function addLogEntry(control, type) {
   const now = performance.now()
@@ -112,20 +120,28 @@ function updateStats() {
   const statsEl = document.getElementById('debug-stats')
   if (!statsEl) return
 
-  // Try to find Phaser game instance
+  // Try to find Phaser game instance (various ways it might be exposed)
   if (!phaserGame) {
-    // Phaser games are often attached to window or a global
     phaserGame = window.game || window.Phaser?.GAMES?.[0] || null
-    // Also try finding it via the canvas
+    // Search through window properties for anything with a 'loop' that looks like Phaser
     if (!phaserGame) {
-      const canvas = document.querySelector('canvas')
-      if (canvas) {
-        // Check for game reference on canvas or parent elements
-        let el = canvas
-        while (el && !phaserGame) {
-          phaserGame = el.game || el.__game || el._game
-          el = el.parentElement
-        }
+      for (const key of Object.keys(window)) {
+        try {
+          const val = window[key]
+          if (val?.loop?.actualFps !== undefined || val?.loop?.delta !== undefined) {
+            phaserGame = val
+            break
+          }
+        } catch (e) {}
+      }
+    }
+    // Try shadowRoot of custom elements
+    if (!phaserGame) {
+      const el = document.querySelector('[game]') || document.querySelector('pacman-game')
+      if (el?.game) phaserGame = el.game
+      if (el?.shadowRoot) {
+        const inner = el.shadowRoot.querySelector('[game]')
+        if (inner?.game) phaserGame = inner.game
       }
     }
   }
@@ -139,7 +155,7 @@ function updateStats() {
   const avgPoll = pollTimes.length > 0
     ? (pollTimes.reduce((a,b) => a+b, 0) / pollTimes.length).toFixed(1)
     : '--'
-  statsEl.textContent = `poll:${avgPoll}ms raf:${currentFps} game:${gameFps}fps ${gameFrameTime}ms`
+  statsEl.textContent = `poll:${avgPoll}ms raf:${currentFps} game:${gameFps} err:${errorCount}`
 }
 
 // ============== END DEBUG OVERLAY ==============
