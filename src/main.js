@@ -1,6 +1,55 @@
 import './style.css'
 import { PLAYER_1, PLAYER_2 } from '@rcade/plugin-input-classic'
 
+// Debug overlay
+const debugPanel = document.createElement('div')
+debugPanel.id = 'debug-panel'
+debugPanel.style.cssText = `
+  position: fixed;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.8);
+  color: #0f0;
+  font-family: monospace;
+  font-size: 8px;
+  padding: 3px;
+  z-index: 99999;
+  pointer-events: none;
+  line-height: 1.2;
+  max-width: 100px;
+`
+document.body.appendChild(debugPanel)
+
+let lastPollTime = performance.now()
+let pollDelta = 0
+let rafCount = 0
+let lastRafTime = performance.now()
+let rafFps = 0
+let gameFps = '--'
+let errorCount = 0
+
+// Track game FPS from Phaser
+setInterval(() => {
+  try {
+    const game = window.game || document.querySelector('canvas')?.game
+    if (game && game.loop) {
+      gameFps = Math.round(game.loop.actualFps)
+    }
+  } catch (e) {}
+}, 500)
+
+// Count errors
+window.addEventListener('error', () => errorCount++)
+
+function updateDebug() {
+  debugPanel.innerHTML = `
+    <div>poll: ${pollDelta.toFixed(0)}ms</div>
+    <div>raf: ${rafFps}</div>
+    <div>game: ${gameFps}</div>
+    <div>err: ${errorCount}</div>
+  `
+}
+
 // Pac-Man uses arrow keys for movement
 const controlMap = [
   { control: 'P1_up', key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
@@ -54,6 +103,17 @@ function getControlState(control) {
 }
 
 function updateControls() {
+  const now = performance.now()
+  pollDelta = now - lastPollTime
+  lastPollTime = now
+
+  rafCount++
+  if (now - lastRafTime >= 1000) {
+    rafFps = rafCount
+    rafCount = 0
+    lastRafTime = now
+  }
+
   for (const mapping of controlMap) {
     const isPressed = getControlState(mapping.control)
     if (isPressed && !pressedState[mapping.control]) {
@@ -63,6 +123,8 @@ function updateControls() {
     }
     pressedState[mapping.control] = isPressed
   }
+
+  updateDebug()
   requestAnimationFrame(updateControls)
 }
 
