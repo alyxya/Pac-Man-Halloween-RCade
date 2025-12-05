@@ -4,9 +4,41 @@
   box-sizing: border-box;
 }
 
-html, body {
-  width: 336px;
-  height: 262px;
+:root {
+  /*
+   * Fixed resolution scaling: render at larger size, CSS downscale to fit.
+   * Base game: 336x262, rendered at 3x = 1008x786
+   *
+   * To calculate --display-scale for your screen:
+   *   scale = min(screenWidth / 1008, screenHeight / 786)
+   * Example: 1920x1080 display -> min(1.90, 1.37) = 1.37
+   * Example: 1280x720 display  -> min(1.27, 0.92) = 0.92
+   */
+  --render-width: 1008px;
+  --render-height: 786px;
+  --display-scale: 0.92;  /* Adjust for your RCade display */
+}
+
+html {
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+  /* Fixed larger dimensions */
+  width: var(--render-width);
+  height: var(--render-height);
+  min-width: var(--render-width);
+  min-height: var(--render-height);
+  max-width: var(--render-width);
+  max-height: var(--render-height);
+  overflow: hidden;
+  background-color: #000;
+  transform-origin: center center;
+  transform: scale(var(--display-scale));
 }
