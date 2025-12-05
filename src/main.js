@@ -255,6 +255,30 @@ function updateControls() {
 
 updateControls()
 
+// Restore native addEventListener before loading Phaser game
+// RCade platform overrides these to block direct input handling,
+// but Phaser needs them to initialize its input system
+try {
+  const nativeDocAddEventListener = Document.prototype.addEventListener
+  const nativeWinAddEventListener = Window.prototype.addEventListener
+  const nativeElemAddEventListener = EventTarget.prototype.addEventListener
+
+  // Restore on document
+  if (document.addEventListener.toString().includes('disabled')) {
+    document.addEventListener = nativeDocAddEventListener.bind(document)
+  }
+  // Restore on window
+  if (window.addEventListener.toString().includes('disabled')) {
+    window.addEventListener = nativeWinAddEventListener.bind(window)
+  }
+  // Restore prototypes
+  Document.prototype.addEventListener = nativeDocAddEventListener
+  Window.prototype.addEventListener = nativeWinAddEventListener
+  EventTarget.prototype.addEventListener = nativeElemAddEventListener
+} catch (e) {
+  console.warn('Could not restore native addEventListener:', e)
+}
+
 // Load the Pac-Man game script
 const script = document.createElement('script')
 script.src = '/index.min.js'
