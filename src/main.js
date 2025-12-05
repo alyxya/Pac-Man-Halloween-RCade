@@ -89,6 +89,9 @@ try {
   console.warn('Could not restore native addEventListener:', e)
 }
 
+// Force Canvas2D renderer instead of WebGL (better for Pi without good GPU)
+window.FORCE_CANVAS = true
+
 // Load the Pac-Man game script
 const script = document.createElement('script')
 script.src = '/index.min.js'
