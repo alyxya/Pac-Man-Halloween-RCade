@@ -73,6 +73,7 @@ let lastPollTime = performance.now()
 let pollTimes = []
 let frameCount = 0
 let lastFpsTime = performance.now()
+let lastStatsUpdate = 0
 let currentFps = 0
 let gameFps = '--'
 let gameFrameTime = '--'
@@ -246,7 +247,9 @@ function updateControls() {
     pressedState[mapping.control] = isPressed
   }
 
-  if (DEBUG_ENABLED) {
+  // Only update debug display every 500ms to reduce DOM overhead
+  if (DEBUG_ENABLED && (now - lastStatsUpdate > 500)) {
+    lastStatsUpdate = now
     updateStats()
   }
 
