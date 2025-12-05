@@ -60,7 +60,7 @@ debugOverlay.innerHTML = `
     <div class="ctrl" id="ctrl-P1_B">B</div>
   </div>
   <div class="log" id="debug-log"></div>
-  <div class="stats" id="debug-stats">--ms --fps</div>
+  <div class="stats" id="debug-stats">poll:--ms raf:-- game:--fps</div>
 `
 
 if (DEBUG_ENABLED) {
@@ -74,6 +74,9 @@ let pollTimes = []
 let frameCount = 0
 let lastFpsTime = performance.now()
 let currentFps = 0
+let gameFps = '--'
+let gameFrameTime = '--'
+let phaserGame = null
 
 function addLogEntry(control, type) {
   const now = performance.now()
@@ -108,10 +111,35 @@ function updateControlDisplay(control, active) {
 function updateStats() {
   const statsEl = document.getElementById('debug-stats')
   if (!statsEl) return
+
+  // Try to find Phaser game instance
+  if (!phaserGame) {
+    // Phaser games are often attached to window or a global
+    phaserGame = window.game || window.Phaser?.GAMES?.[0] || null
+    // Also try finding it via the canvas
+    if (!phaserGame) {
+      const canvas = document.querySelector('canvas')
+      if (canvas) {
+        // Check for game reference on canvas or parent elements
+        let el = canvas
+        while (el && !phaserGame) {
+          phaserGame = el.game || el.__game || el._game
+          el = el.parentElement
+        }
+      }
+    }
+  }
+
+  // Get Phaser's internal FPS if available
+  if (phaserGame?.loop) {
+    gameFps = Math.round(phaserGame.loop.actualFps || phaserGame.loop.fps || '--')
+    gameFrameTime = phaserGame.loop.delta ? phaserGame.loop.delta.toFixed(1) : '--'
+  }
+
   const avgPoll = pollTimes.length > 0
     ? (pollTimes.reduce((a,b) => a+b, 0) / pollTimes.length).toFixed(1)
     : '--'
-  statsEl.textContent = `${avgPoll}ms ${currentFps}fps`
+  statsEl.textContent = `poll:${avgPoll}ms raf:${currentFps} game:${gameFps}fps ${gameFrameTime}ms`
 }
 
 // ============== END DEBUG OVERLAY ==============
