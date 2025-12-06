@@ -12,7 +12,5 @@ html, body {
 }
 
 iframe, canvas {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  -webkit-font-smoothing: none;
+  image-rendering: auto;
 }
