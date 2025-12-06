@@ -10,11 +10,3 @@ html, body {
   overflow: hidden;
   background-color: #000;
 }
-
-iframe, canvas {
-  image-rendering: auto;
-  width: 1344px !important;
-  height: 1048px !important;
-  transform: scale(0.25);
-  transform-origin: top left;
-}
