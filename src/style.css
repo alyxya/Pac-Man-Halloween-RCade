@@ -5,12 +5,16 @@
 }
 
 html, body {
-  width: 1344px;
-  height: 1048px;
+  width: 336px;
+  height: 262px;
   overflow: hidden;
   background-color: #000;
 }
 
 iframe, canvas {
   image-rendering: auto;
+  width: 672px !important;
+  height: 524px !important;
+  transform: scale(0.5);
+  transform-origin: top left;
 }
