@@ -1,46 +1,6 @@
 import './style.css'
 import { PLAYER_1, PLAYER_2 } from '@rcade/plugin-input-classic'
 
-// Debug info overlay - shows rendering dimensions
-const info = document.createElement('div')
-info.style.cssText = `
-  position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.8);
-  color: #0f0; font: 8px monospace; padding: 2px; z-index: 99999;
-`
-document.body.appendChild(info)
-
-function updateDebugInfo() {
-  const iframes = document.querySelectorAll('iframe')
-  const iframe = iframes[0]
-
-  let canvasInfo = 'no access'
-  let error = ''
-
-  if (iframe) {
-    try {
-      const doc = iframe.contentDocument
-      const canvas = doc?.querySelector('canvas')
-      if (canvas) {
-        canvasInfo = `${canvas.width}x${canvas.height} (${canvas.clientWidth}x${canvas.clientHeight})`
-      } else {
-        canvasInfo = 'no canvas in iframe'
-      }
-    } catch(e) {
-      error = e.message
-    }
-  }
-
-  info.innerHTML = `
-    window: ${window.innerWidth}x${window.innerHeight}<br>
-    iframes: ${iframes.length}<br>
-    iframeEl: ${iframe?.clientWidth}x${iframe?.clientHeight}<br>
-    canvas: ${canvasInfo}<br>
-    err: ${error}<br>
-    dpr: ${window.devicePixelRatio}
-  `
-}
-setInterval(updateDebugInfo, 1000)
-
 // Pac-Man uses arrow keys for movement
 const controlMap = [
   { control: 'P1_up', key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
