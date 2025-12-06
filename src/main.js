@@ -2,22 +2,26 @@ import './style.css'
 import { PLAYER_1, PLAYER_2 } from '@rcade/plugin-input-classic'
 
 // Debug info overlay - shows rendering dimensions
-setTimeout(() => {
+const info = document.createElement('div')
+info.style.cssText = `
+  position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.8);
+  color: #0f0; font: 8px monospace; padding: 2px; z-index: 99999;
+`
+document.body.appendChild(info)
+
+function updateDebugInfo() {
   const canvas = document.querySelector('canvas')
-  const info = document.createElement('div')
-  info.style.cssText = `
-    position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.8);
-    color: #0f0; font: 8px monospace; padding: 2px; z-index: 99999;
-  `
+  const allCanvases = document.querySelectorAll('canvas')
   info.innerHTML = `
     canvas: ${canvas?.width}x${canvas?.height}<br>
     client: ${canvas?.clientWidth}x${canvas?.clientHeight}<br>
     window: ${window.innerWidth}x${window.innerHeight}<br>
     dpr: ${window.devicePixelRatio}<br>
-    screen: ${screen.width}x${screen.height}
+    screen: ${screen.width}x${screen.height}<br>
+    found: ${allCanvases.length} canvas(es)
   `
-  document.body.appendChild(info)
-}, 3000)
+}
+setInterval(updateDebugInfo, 1000)
 
 // Pac-Man uses arrow keys for movement
 const controlMap = [
