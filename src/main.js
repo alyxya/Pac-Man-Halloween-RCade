@@ -10,28 +10,33 @@ info.style.cssText = `
 document.body.appendChild(info)
 
 function updateDebugInfo() {
-  const canvas = document.querySelector('canvas')
-  const allCanvases = document.querySelectorAll('canvas')
   const iframes = document.querySelectorAll('iframe')
-  const bodyChildren = Array.from(document.body.children).map(el => el.tagName).join(',')
+  const iframe = iframes[0]
 
-  // Check inside iframes
-  let iframeCanvas = null
-  iframes.forEach(iframe => {
+  let canvasInfo = 'no access'
+  let error = ''
+
+  if (iframe) {
     try {
-      iframeCanvas = iframe.contentDocument?.querySelector('canvas')
-    } catch(e) {}
-  })
+      const doc = iframe.contentDocument
+      const canvas = doc?.querySelector('canvas')
+      if (canvas) {
+        canvasInfo = `${canvas.width}x${canvas.height} (${canvas.clientWidth}x${canvas.clientHeight})`
+      } else {
+        canvasInfo = 'no canvas in iframe'
+      }
+    } catch(e) {
+      error = e.message
+    }
+  }
 
   info.innerHTML = `
-    canvas: ${canvas?.width}x${canvas?.height}<br>
-    client: ${canvas?.clientWidth}x${canvas?.clientHeight}<br>
     window: ${window.innerWidth}x${window.innerHeight}<br>
-    dpr: ${window.devicePixelRatio}<br>
-    screen: ${screen.width}x${screen.height}<br>
-    canvases: ${allCanvases.length} iframes: ${iframes.length}<br>
-    iframeCanvas: ${iframeCanvas?.width}x${iframeCanvas?.height}<br>
-    body: ${bodyChildren.slice(0,50)}
+    iframes: ${iframes.length}<br>
+    iframeEl: ${iframe?.clientWidth}x${iframe?.clientHeight}<br>
+    canvas: ${canvasInfo}<br>
+    err: ${error}<br>
+    dpr: ${window.devicePixelRatio}
   `
 }
 setInterval(updateDebugInfo, 1000)

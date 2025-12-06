@@ -10,3 +10,9 @@ html, body {
   overflow: hidden;
   background-color: #000;
 }
+
+iframe, canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+}
