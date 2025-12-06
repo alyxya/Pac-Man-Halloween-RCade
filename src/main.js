@@ -12,13 +12,26 @@ document.body.appendChild(info)
 function updateDebugInfo() {
   const canvas = document.querySelector('canvas')
   const allCanvases = document.querySelectorAll('canvas')
+  const iframes = document.querySelectorAll('iframe')
+  const bodyChildren = Array.from(document.body.children).map(el => el.tagName).join(',')
+
+  // Check inside iframes
+  let iframeCanvas = null
+  iframes.forEach(iframe => {
+    try {
+      iframeCanvas = iframe.contentDocument?.querySelector('canvas')
+    } catch(e) {}
+  })
+
   info.innerHTML = `
     canvas: ${canvas?.width}x${canvas?.height}<br>
     client: ${canvas?.clientWidth}x${canvas?.clientHeight}<br>
     window: ${window.innerWidth}x${window.innerHeight}<br>
     dpr: ${window.devicePixelRatio}<br>
     screen: ${screen.width}x${screen.height}<br>
-    found: ${allCanvases.length} canvas(es)
+    canvases: ${allCanvases.length} iframes: ${iframes.length}<br>
+    iframeCanvas: ${iframeCanvas?.width}x${iframeCanvas?.height}<br>
+    body: ${bodyChildren.slice(0,50)}
   `
 }
 setInterval(updateDebugInfo, 1000)
